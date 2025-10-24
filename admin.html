@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>لوحة المشرف — قطاع الوسط</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;700;900&display=swap" rel="stylesheet">
+<style>
+  :root{--bg1:#f7fbff;--bg2:#eaf3ff;--card:#fff;--border:#e6eef7;--text:#0d1b2a;--muted:#5c6b7a;--brand:#1E88E5;--brand2:#42A5F5;}
+  :root[data-theme="dark"]{--bg1:#0e1726;--bg2:#162235;--card:#111827;--border:#213047;--text:#e6edf5;--muted:#a9b8c7;}
+  *{box-sizing:border-box} body{margin:0;font-family:'Cairo',system-ui,Arial;background:linear-gradient(135deg,var(--bg1),var(--bg2));color:var(--text);}
+  .top-right{position:fixed;right:16px;top:14px;display:flex;align-items:center;gap:8px}
+  .theme-btn{width:42px;height:42px;border:none;border-radius:999px;background:linear-gradient(180deg,var(--card),#eef6ff);box-shadow:0 10px 24px rgba(0,0,0,.12);cursor:pointer}
+  header{display:flex;justify-content:center;padding:28px 16px 12px}
+  .title{font-size:26px;font-weight:900}
+  .wrap{max-width:900px;margin:0 auto;padding:12px 16px 36px}
+  .tabs{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-bottom:12px}
+  .tab{border:none;border-radius:12px;color:#fff;background:linear-gradient(135deg,var(--brand),var(--brand2));padding:10px 14px;cursor:pointer;box-shadow:0 10px 24px rgba(30,136,229,.35)}
+  .panel{display:none;background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px;box-shadow:0 10px 26px rgba(0,0,0,.08)}
+  .panel.active{display:block}
+  label{font-weight:800;margin-top:8px;display:block}
+  textarea,input[type=text]{width:100%;padding:10px;border:1px solid var(--border);border-radius:10px;background:transparent;color:var(--text)}
+  .btn{border:none;border-radius:12px;color:#fff;background:linear-gradient(135deg,var(--brand),var(--brand2));padding:10px 14px;cursor:pointer;box-shadow:0 10px 24px rgba(30,136,229,.35)}
+  .toast{position:fixed;right:16px;top:16px;background:#0a7d32;color:#fff;border-radius:12px;padding:10px 14px;display:none}
+  .toast.err{background:#c62828}
+  #gate{position:fixed;inset:0;background:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center}
+  #gate .box{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:18px;width:320px;box-shadow:0 10px 26px rgba(0,0,0,.2)}
+</style>
+</head>
+<body>
+<div class="top-right">
+  <button class="theme-btn" id="themeBtn">🌙</button><div style="font-weight:800;color:var(--muted)">تبديل النمط</div>
+</div>
+<header><div class="title">لوحة المشرف — قطاع الوسط</div></header>
+<div class="wrap" id="content" style="display:none">
+  <div class="tabs">
+    <button class="tab" onclick="openTab('ads',this)">الإعلانات</button>
+    <button class="tab" onclick="openTab('honor',this)">لوحة الشرف</button>
+    <button class="tab" onclick="openTab('links',this)">الروابط</button>
+  </div>
+
+  <section id="ads" class="panel active">
+    <label>نص الإعلان</label>
+    <textarea id="adText" placeholder="اكتب نص الإعلان هنا..."></textarea>
+    <div style="margin-top:10px"><button class="btn" onclick="sendAd()">نشر الإعلان</button></div>
+  </section>
+
+  <section id="honor" class="panel">
+    <label>اسم المركز</label><input id="center" type="text" placeholder="مثال: مركز الوسط">
+    <label>اسم الفرقة</label><input id="team" type="text" placeholder="مثال: فرقة الصقور">
+    <label>أسماء الأعضاء (كل اسم في سطر)</label><textarea id="members" placeholder="محمد\nخالد\nعبدالعزيز"></textarea>
+    <div style="margin-top:10px"><button class="btn" onclick="sendHonor()">حفظ لوحة الشرف</button></div>
+  </section>
+
+  <section id="links" class="panel">
+    <label>رابط جدول القطاع</label><input id="lnkTable" type="text" placeholder="https://...">
+    <label>رابط حجز الإجازات</label><input id="lnkVacation" type="text" placeholder="https://...">
+    <label>رابط التشييك اليومي</label><input id="lnkCheck" type="text" placeholder="https://...">
+    <label>رابط تبديل المناوبات</label><input id="lnkSwap" type="text" placeholder="https://...">
+    <label>رابط الاقتراحات</label><input id="lnkSuggest" type="text" placeholder="https://...">
+    <div style="margin-top:10px"><button class="btn" onclick="saveLinks()">حفظ الروابط</button></div>
+  </section>
+</div>
+
+<div id="gate">
+  <div class="box">
+    <div style="font-weight:800;margin-bottom:8px">كلمة مرور المشرف</div>
+    <input type="password" id="pwd" style="width:100%;padding:10px;border:1px solid var(--border);border-radius:10px">
+    <div style="display:flex;gap:8px;margin-top:10px">
+      <button class="btn" onclick="login()">دخول</button>
+      <button class="btn" onclick="document.getElementById('pwd').value=''">إلغاء</button>
+    </div>
+    <div id="msg" style="color:#c62828;margin-top:8px;display:none">كلمة المرور غير صحيحة</div>
+  </div>
+</div>
+
+<div id="toast" class="toast"></div>
+
+<script>
+const SCRIPT_URL = "https://script.googleusercontent.com/macros/echo?user_content_key=AehSKLiBt9VwvcowmfbacRqeZTvsp3C9-qdYJmMs0_R_T3ScSfecJGl9EtIzKwtWGI9jMgWBGqoqXqT_yxqnZAbKiyQMYpDihcdRf8KqbOSAwEsGUEF2LVzYKeQDVj8sFBuaGA8HrQXD5zE4jjsVz18iRNClsvYpoo_yrL3O5hxvCKr0vono9FJYXFGyt3ONEpt6_rM6V5GFSslJ0Lfr7ClTW20wV8zr8KYPp0bwqeLU3bTrm7_T5iCAhBUkfjlPUTnw-GoJ7eQmKN-jE8JiIRwXb8cu4gt8dgckBrS8l-Y3&lib=M6dwE7UlaQmbBMEakihoL5071_fspkL81";
+
+const root = document.documentElement;
+const saved = localStorage.getItem('theme') || 'light';
+if(saved==='dark'){ root.setAttribute('data-theme','dark'); document.getElementById('themeBtn').textContent='☀️'; }
+document.getElementById('themeBtn').onclick = ()=>{
+  const dark = root.getAttribute('data-theme')==='dark';
+  root.setAttribute('data-theme', dark?'light':'dark');
+  localStorage.setItem('theme', dark?'light':'dark');
+  document.getElementById('themeBtn').textContent = dark?'🌙':'☀️';
+};
+
+function toast(msg,err){const t=document.getElementById('toast');t.textContent=msg;t.className='toast'+(err?' err':'');t.style.display='block';setTimeout(()=>t.style.display='none',2500);}
+function openTab(id,btn){document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));document.getElementById(id).classList.add('active');}
+function login(){const v=document.getElementById('pwd').value; if(v==='admin3838771'){document.getElementById('gate').style.display='none'; document.getElementById('content').style.display='block';} else {document.getElementById('msg').style.display='block';}}
+
+async function postJSON(payload){
+  try{
+    const r=await fetch(SCRIPT_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
+    const ct=r.headers.get('content-type')||''; let data=null;
+    if(ct.includes('application/json')) data=await r.json(); else data={};
+    if((data.status && data.status==='success') || data.ok===true) return true;
+    console.log('RESP',data); return false;
+  }catch(e){console.error(e); return false;}
+}
+
+function sendAd(){
+  const text = document.getElementById('adText').value.trim();
+  if(!text) return toast('اكتب نص الإعلان أولاً',true);
+  if(!confirm('تأكيد نشر الإعلان؟')) return;
+  postJSON({sheet:'الإعلانات', title:'', text}).then(s=>{ if(s){toast('تم الحفظ ✅'); document.getElementById('adText').value='';} else toast('خطأ أثناء الإرسال',true); });
+}
+
+function sendHonor(){
+  const center=document.getElementById('center').value.trim();
+  const team=document.getElementById('team').value.trim();
+  const members=document.getElementById('members').value.split('\\n').map(s=>s.trim()).filter(Boolean);
+  if(!center||!team||!members.length) return toast('أكمل جميع الحقول',true);
+  if(!confirm('تأكيد حفظ لوحة الشرف؟')) return;
+  postJSON({sheet:'لوحة الشرف', center, team, members}).then(s=>{ toast(s?'تم الحفظ ✅':'خطأ أثناء الإرسال',!s); });
+}
+
+function saveLinks(){
+  const table=document.getElementById('lnkTable').value.trim();
+  const vacation=document.getElementById('lnkVacation').value.trim();
+  const check=document.getElementById('lnkCheck').value.trim();
+  const swap=document.getElementById('lnkSwap').value.trim();
+  const suggestions=document.getElementById('lnkSuggest').value.trim();
+  if(!confirm('تأكيد حفظ الروابط؟')) return;
+  postJSON({sheet:'الروابط', table, vacation, check, swap, suggestions}).then(s=>{ toast(s?'تم الحفظ ✅':'خطأ أثناء الإرسال',!s); });
+}
+</script>
+</body>
+</html>
